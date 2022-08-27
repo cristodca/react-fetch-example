@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 // Styles
 import './TripList.css'
@@ -7,11 +7,16 @@ export default function TripList() {
   const [trips, setTrips] = useState([])
   const [url, setUrl] = useState('http://localhost:3000/trips')
 
-  useEffect(() => {
-    fetch(url)
-      .then(response => response.json())
-      .then(json => setTrips(json))
+  const fetchTrips = useCallback(async () => {
+    const response = await fetch(url)
+    const json = await response.json()
+
+    setTrips(json)
   }, [url])
+
+  useEffect(() => {
+    fetchTrips()
+  }, [fetchTrips])
 
   console.log(trips)
 
@@ -20,7 +25,7 @@ export default function TripList() {
       <h2>Trip List</h2>
 
       <ul>
-        {trips && trips.map(trip => (
+        {trips.length > 0 && trips.map(trip => (
           <li key={trip.id}>
             <h3>{trip.title}</h3>
             <p>{trip.price}</p>
